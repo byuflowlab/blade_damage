@@ -1,3 +1,23 @@
+from openmdao.api import IndepVarComp, Component, Group, ParallelFDGroup
+import numpy as np
+import sys
+import os
+from distutils.dir_util import copy_tree
+from akima import Akima, akima_interp_with_derivs
+import matlab.engine
+import re
+from scipy import stats
+import os
+import time
+import matplotlib.pyplot as plt
+import pickle
+
+# AeroelasticSE
+sys.path.insert(0, '../RotorSE_FAST/AeroelasticSE/src/AeroelasticSE/FAST_mdao')
+
+# rainflow
+sys.path.insert(0, '../RotorSE_FAST/AeroelasticSE/src/AeroelasticSE/rainflow')
+
 # ===================== OpenMDAO Components and Groups ===================== #
 
 class CreateFASTConfig(Component):
@@ -204,7 +224,11 @@ class CreateFASTConfig(Component):
                     f = open(aerodyn_file_name, "r")
 
                     lines = f.readlines()
-                    lines = lines[24:41]
+
+                    if self.FAST_template_name == 'NREL5MW':
+                        lines = lines[28:45]
+                    else:
+                        lines = lines[24:41]
 
                     DR_nodes = []
 
@@ -2058,7 +2082,7 @@ class CreateFASTConstraints(Component):
         if self.save_tq:
             if self.DLC_List[0] == 'DLC_0_0':
 
-                print('Calculating rated torque and thrust...')
+                print('Calculating rated torque...')
 
                 gen_tq_avg = sum(resultsdict['GenTq'])/len(resultsdict['GenTq'])
 
@@ -2708,8 +2732,68 @@ class CreateFASTConstraints(Component):
 
         unknowns['max_tip_def'] = max(max_tip_def_array)
 
+class Blade_Damage(Group):
+    def __init__(self, FASTinfo, naero=17, nstr=38):
+        super(Blade_Damage, self).__init__()
 
+        self.add('chord_sub', IndepVarComp('chord_sub', np.zeros(4),units='m'), promotes=['*'])
+        self.add('theta_sub', IndepVarComp('theta_sub', np.zeros(4), units='deg'), promotes=['*'])
+        self.add('r_max_chord', IndepVarComp('r_max_chord', 0.0), promotes=['*'])
 
+        self.add('sparT', IndepVarComp('sparT', val=np.zeros(5), units='m', desc='spar cap thickness parameters'),
+                 promotes=['*'])
+        self.add('teT', IndepVarComp('teT', val=np.zeros(5), units='m', desc='trailing-edge thickness parameters'),
+                 promotes=['*'])
+
+        # === use surrogate model of FAST outputs === #
+        if FASTinfo['Use_FAST_sm']:
+
+            # create fit - can check to see if files already created either here or in component
+            pkl_file_name = FASTinfo['opt_dir'] + '/' + 'sm_x' + '_' + FASTinfo['approximation_model'] + '.pkl'
+            if not os.path.isfile(pkl_file_name):
+                self.add('FAST_sm_fit', calc_FAST_sm_fit(FASTinfo, naero, nstr))
+
+            # use fit
+            self.add('use_FAST_sm_fit', use_FAST_surr_model(FASTinfo, naero, nstr),
+                     promotes=['DEMx_sm', 'DEMy_sm', 'Flp_sm', 'Edg_sm', 'def_sm'])
+
+        # === use FAST === #
+        if FASTinfo['use_FAST']:
+
+            WND_File_List = FASTinfo['wnd_list']
+
+            # create WNDfile case ids
+            caseids = FASTinfo['caseids']
+
+            self.add('FASTconfig', CreateFASTConfig(naero, nstr, FASTinfo, WND_File_List, caseids),
+                     promotes=['cfg_master'])
+
+            from FST7_aeroelasticsolver import FST7Workflow, FST7AeroElasticSolver
+
+            self.add('ParallelFASTCases', FST7AeroElasticSolver(caseids, FASTinfo['Tmax_turb'],
+                                                                FASTinfo['Tmax_nonturb'], FASTinfo['rm_time'],
+                                                                FASTinfo['wnd_type_list'], FASTinfo['dT'],
+                                                                FASTinfo['output_list']))
+
+            self.connect('cfg_master', 'ParallelFASTCases.cfg_master')
+
+            self.add('FASTConstraints', CreateFASTConstraints(naero, nstr, FASTinfo, WND_File_List, caseids),
+                     promotes=['DEMx', 'DEMy', 'max_tip_def', 'Edg_max', 'Flp_max'])
+
+            for i in range(len(caseids)):
+                self.connect('ParallelFASTCases.' + caseids[i], 'FASTConstraints.' + caseids[i])
+
+            self.connect('cfg_master', 'FASTConstraints.cfg_master')
+
+            if FASTinfo['calc_surr_model']:
+                self.add('calc_FAST_sm_training_points', Calculate_FAST_sm_training_points(FASTinfo, naero, nstr))
+
+        # === necessary connections ==== #
+        if FASTinfo['use_FAST']:
+
+            # FAST config
+            self.connect('chord_sub', 'FASTconfig.chord_sub')
+            self.connect('theta_sub', 'FASTconfig.theta_sub')
 
 if __name__=="__main__":
 	pass

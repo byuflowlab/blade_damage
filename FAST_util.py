@@ -17,7 +17,7 @@ def setupFAST_checks(FASTinfo):
 
     # === check splines / results === #
     # if any are set as true, False will stop
-    FASTinfo['check_results'] = True  # Opt. stops if set as True
+    FASTinfo['check_results'] = False  # Opt. stops if set as True
     FASTinfo['check_sgp_spline'] = False  # Opt. stops if set as True
     FASTinfo['check_stif_spline'] = False  # Opt. stops if set as True
     FASTinfo['check_peaks'] = False  # Opt. stops if set as True
@@ -33,7 +33,7 @@ def setupFAST_checks(FASTinfo):
     FASTinfo['do_cv_DEM'] = False  # cross validation of surrogate model for DEMs
     FASTinfo['do_cv_Load'] = False  # cross validation of surrogate model for extreme loads
     FASTinfo['do_cv_def'] = False  # cross validation of surrogate model for tip deflection
-    FASTinfo['check_sm_accuracy'] = True # checks accuracy of sm for initial design
+    FASTinfo['check_sm_accuracy'] = False # checks accuracy of sm for initial design
 
     FASTinfo['check_point_dist'] = False  # plot distribution of points (works best in 2D)
     FASTinfo['check_cv'] = False # works best in 2D
@@ -78,11 +78,14 @@ def setupFAST(FASTinfo, description):
 
     # === dir_saved_plots === #
     # FASTinfo['dir_saved_plots'] = '/fslhome/ingerbry/GradPrograms/opt_plots'
-    FASTinfo['dir_saved_plots'] = '/Users/bingersoll/Desktop'
+    # FASTinfo['dir_saved_plots'] = '/Users/bingersoll/Desktop'
+    FASTinfo['dir_saved_plots'] = '.'
 
     # === Optimization and Template Directories === #
-    FASTinfo['opt_dir'] = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
-        'RotorSE/src/rotorse/FAST_Files/Opt_Files/', FASTinfo['description']))
+    # FASTinfo['opt_dir'] = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
+    #     'RotorSE/src/rotorse/FAST_Files/Opt_Files/', FASTinfo['description']))
+    FASTinfo['opt_dir'] = ''.join((FASTinfo['path'], 'blade-damage/FAST_Files/Opt_Files/', FASTinfo['description']))
+
 
     if os.path.isdir(FASTinfo['opt_dir']):
         pass
@@ -92,10 +95,11 @@ def setupFAST(FASTinfo, description):
     # === set FAST template files === #
 
     # NREL5MW, WP_5.0MW, WP_3.0MW, WP_1.5MW, WP_0.75MW
-    FASTinfo['FAST_template_name'] = 'WP_5.0MW'
+    FASTinfo['FAST_template_name'] = 'NREL5MW'
 
-    FASTinfo['template_dir'] = FASTinfo['path'] + 'RotorSE_FAST/RotorSE/src/rotorse/' \
-                            'FAST_Files/FAST_File_templates/' + FASTinfo['FAST_template_name'] + '/'
+    # FASTinfo['template_dir'] = FASTinfo['path'] + 'RotorSE_FAST/RotorSE/src/rotorse/' \
+    #                         'FAST_Files/FAST_File_templates/' + FASTinfo['FAST_template_name'] + '/'
+    FASTinfo['template_dir'] = FASTinfo['path'] + 'FAST_Files/FAST_File_templates/' + FASTinfo['FAST_template_name'] + '/'
 
     # === get FAST executable === #
     FASTinfo = get_FAST_executable(FASTinfo)
@@ -109,8 +113,9 @@ def setupFAST(FASTinfo, description):
         FASTinfo['prev_description'] = 'test_batch_1'
 
         # for running multiple times
-        FASTinfo['prev_opt_dir'] = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
-            'RotorSE/src/rotorse/FAST_Files/Opt_Files/', FASTinfo['prev_description']))
+        # FASTinfo['prev_opt_dir'] = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
+        #     'RotorSE/src/rotorse/FAST_Files/Opt_Files/', FASTinfo['prev_description']))
+        FASTinfo['prev_opt_dir'] = ''.join((FASTinfo['path'], './FAST_Files/Opt_Files/', FASTinfo['prev_description']))
 
     FASTinfo['max_DEMx_file'] = FASTinfo['opt_dir'] + '/xDEM_max.txt'
     FASTinfo['max_DEMy_file'] = FASTinfo['opt_dir'] + '/yDEM_max.txt'
@@ -159,8 +164,8 @@ def setupFAST(FASTinfo, description):
             plot_kfolds(FASTinfo)
 
     # === strain gage placement === #
-    # FASTinfo['sgp'] = [1, 2, 3]
-    FASTinfo['sgp'] = [4]
+    FASTinfo['sgp'] = [1, 2, 3]
+    # FASTinfo['sgp'] = [4]
 
     #for each position
     FASTinfo['NBlGages'] = []
@@ -229,7 +234,7 @@ def setupFAST_other(FASTinfo):
     FASTinfo['calculation_type'] = 'sequential'
 
     # save rated torque
-    FASTinfo['save_rated_torque'] = True
+    FASTinfo['save_rated_torque'] = False
 
     # use this when training points for surrogate model
     FASTinfo['remove_sm_dir'] = False
@@ -237,6 +242,7 @@ def setupFAST_other(FASTinfo):
     # === below are two useful options when training different designs for the surrogate model === #
 
     # run template files - no connection with RotorSE - used to train surrogate model using WindPact turbine designs
+    # also used to calculate damage equivalent moments (DEMs)
     FASTinfo['run_template_files'] = False
     # change just chord, twist distributions
     FASTinfo['set_chord_twist'] = True
@@ -266,13 +272,13 @@ def specify_DLCs(FASTinfo):
     if not FASTinfo['use_DLC_list']:
 
         # === for optimization === #
-        DLC_List = ['DLC_1_2', 'DLC_1_3', 'DLC_1_4','DLC_1_5', 'DLC_6_1', 'DLC_6_3']
+        # DLC_List = ['DLC_1_2', 'DLC_1_3', 'DLC_1_4','DLC_1_5', 'DLC_6_1', 'DLC_6_3']
         # DLC_List = ['DLC_0_0', 'DLC_1_2', 'DLC_1_3', 'DLC_1_4',' DLC_1_5', 'DLC_6_1', 'DLC_6_3']
 
         # === for testing === #
 
         # rated speed wind file
-        # DLC_List = ['DLC_0_0']
+        DLC_List = ['DLC_0_0']
 
         # non turbulent DLCs
         # DLC_List = ['DLC_1_4','DLC_1_5','DLC_6_1','DLC_6_3']
@@ -343,10 +349,10 @@ def choose_wnd_dir(FASTinfo):
         FASTinfo['turbulence_intensity'] = 0.16
 
     # === turbulent, nonturbulent directories === #
-    FASTinfo['master_turb_wnd_dir'] = 'RotorSE_FAST/WND_Files/turb_wnd_dir_' \
+    FASTinfo['master_turb_wnd_dir'] = './WND_Files/turb_wnd_dir_' \
     + FASTinfo['turbulence_class'] + '_' + FASTinfo['turbine_class'] + '/'
 
-    FASTinfo['master_nonturb_wnd_dir'] = 'RotorSE_FAST/WND_Files/nonturb_wnd_dir/'
+    FASTinfo['master_nonturb_wnd_dir'] = './WND_Files/nonturb_wnd_dir/'
 
 
     if FASTinfo['train_sm']:
@@ -356,7 +362,7 @@ def choose_wnd_dir(FASTinfo):
         except:
             training_point_num = 0
 
-        new_wnd_dir = 'RotorSE_FAST/WND_Files/training_point_' + str(training_point_num)
+        new_wnd_dir = './WND_Files/training_point_' + str(training_point_num)
 
         # create new wind directories if training points for surrogate model
         if not os.path.isdir(FASTinfo['path'] + new_wnd_dir):
@@ -537,15 +543,15 @@ def plot_kfolds(FASTinfo):
 def get_FAST_executable(FASTinfo):
 
     if FASTinfo['FAST_template_name'] == 'NREL5MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + 'RotorSE_FAST/FAST_exe/' + 'FAST_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_0.75MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + 'RotorSE_FAST/FAST_exe/' + 'FAST_WP_075MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_075MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_1.5MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + 'RotorSE_FAST/FAST_exe/' + 'FAST_WP_15MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_15MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_3.0MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + 'RotorSE_FAST/FAST_exe/' + 'FAST_WP_3MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_3MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_5.0MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + 'RotorSE_FAST/FAST_exe/' + 'FAST_WP_5MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_5MW_glin64'
     else:
         raise Exception('FAST executable unavailable, must be built from source.')
 
@@ -1201,7 +1207,6 @@ def get_bladelength(FASTinfo):
 # initialize design variables
 def initialize_rotor_dv(FASTinfo, rotor):
 
-
     if FASTinfo['FAST_template_name'] == 'NREL5MW':
         rotor['chord_sub'] = np.array([3.2612, 4.5709, 3.3178,   1.4621])
         rotor['theta_sub'] = np.array([13.2783, 7.46036, 2.89317,   -0.0878099])
@@ -1361,8 +1366,10 @@ def Calc_max_DEMs(FASTinfo, rotor):
             # spec_wnd_dir = FASTinfo['description'] + '/' + 'sgp' + str(sgp) + '/' + caseids[i - 1] + '_sgp' + str(sgp)
             spec_wnd_dir = FASTinfo['description'] + '/' + 'sgp' + str(sgp) + '/' + caseids[i] + '_sgp' + str(sgp)
 
-            FAST_wnd_directory = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
-                                                            'RotorSE/src/rotorse/FAST_Files/Opt_Files/', spec_wnd_dir))
+            # FAST_wnd_directory = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
+            #                                                 'RotorSE/src/rotorse/FAST_Files/Opt_Files/', spec_wnd_dir))
+            FAST_wnd_directory = ''.join((FASTinfo['path'], 'blade-damage/Opt_Files/', spec_wnd_dir))
+
 
             # xDEM / yDEM files
 

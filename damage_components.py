@@ -11,6 +11,7 @@ import os
 import time
 import matplotlib.pyplot as plt
 import pickle
+from enum import Enum
 
 # AeroelasticSE
 sys.path.insert(0, '../RotorSE_FAST/AeroelasticSE/src/AeroelasticSE/FAST_mdao')
@@ -570,6 +571,7 @@ class use_FAST_surr_model(Component):
         unknowns['DEMy_sm'] = DEMy_sm
         unknowns['Edg_sm'] = Edg_sm
         unknowns['Flp_sm'] = Flp_sm
+
         # unknowns['def_sm'] = def_sm
 
 
@@ -592,6 +594,8 @@ class calc_FAST_sm_fit(Component):
         self.approximation_model = FASTinfo['approximation_model']
 
         self.training_point_dist = FASTinfo['training_point_dist'] # 'linear', 'lhs'
+
+        self.calc_DEM_using_sm_no_opt = FASTinfo['calc_DEM_using_sm_no_opt']
 
         if self.training_point_dist == 'lhs':
             self.num_pts = FASTinfo['num_pts']
@@ -657,7 +661,6 @@ class calc_FAST_sm_fit(Component):
         self.add_param('turbulence_intensity', val=0.14, desc='IEC turbine class intensity', pass_by_obj=True)
         self.add_param('af_idx', val=np.zeros(naero))
         self.add_param('airfoil_types', val=np.zeros(8))
-
 
     def solve_nonlinear(self, params, unknowns, resids):
 
@@ -1063,6 +1066,58 @@ class calc_FAST_sm_fit(Component):
         # sm_def.set_training_values(np.transpose(xt), np.transpose(yt_def))
         # sm_def.options['print_global'] = self.print_sm
         # sm_def.train()
+
+        if self.calc_DEM_using_sm_no_opt:
+
+            # === estimate outputs === #
+
+            # current design variable values
+            sv = []
+            for i in range(0, len(self.sm_var_names)):
+
+                # chord_sub, theta_sub
+                if hasattr(params[self.sm_var_names[i]], '__len__'):
+                    for j in range(0, len(self.sm_var_names[i])):
+
+                        if j in self.sm_var_index[i]:
+
+                            # calculate chord / blade length
+                            if self.sm_var_names[i] == 'chord_sub':
+                                sv.append(params[self.sm_var_names[i]][j] / (params['bladeLength']))
+                            else:
+                                sv.append(params[self.sm_var_names[i]][j])
+                # turbulence intensity
+                else:
+                    sv.append(params[self.sm_var_names[i]])
+
+            # === predict values === #
+
+            int_sv = np.zeros([len(sv), 1])
+            for i in range(0, len(int_sv)):
+                int_sv[i] = sv[i]
+
+            # DEMs
+            DEMx_sm = np.transpose(sm_x.predict_values(np.transpose(int_sv)))
+            DEMy_sm = np.transpose(sm_y.predict_values(np.transpose(int_sv)))
+
+            # extreme loads
+            Edg_sm = np.transpose(sm_x_load.predict_values(np.transpose(int_sv)))
+            Flp_sm = np.transpose(sm_y_load.predict_values(np.transpose(int_sv)))
+
+            print('Edgewise DEMs:')
+            print(DEMx_sm)
+
+            print('Flapwise DEMs:')
+            print(DEMy_sm)
+
+            print('Edgewise Extreme Moments:')
+            print(Edg_sm)
+
+            print('Flapwise Extreme Moments:')
+            print(Flp_sm)
+
+            quit()
+
 
         # === created surrogate models to .pkl files
         sm_list = [sm_x, sm_y, sm_x_load, sm_y_load]
@@ -2026,8 +2081,8 @@ class CreateFASTConstraints(Component):
 
         # Structure
         self.eme_fit = FASTinfo['eme_fit']
-        self.add_output('Edg_max',val=np.zeros(nstr))
-        self.add_output('Flp_max',val=np.zeros(nstr))
+        self.add_output('Edg_max', val=np.zeros(nstr))
+        self.add_output('Flp_max', val=np.zeros(nstr))
 
     def solve_nonlinear(self, params, unknowns, resids):
 
@@ -2640,6 +2695,7 @@ class CreateFASTConstraints(Component):
         unknowns['DEMx'] *= 1000.0
         unknowns['DEMy'] *= 1000.0
 
+
         if self.check_sgp_spline:
 
             # plot splines
@@ -2732,10 +2788,12 @@ class CreateFASTConstraints(Component):
 
         unknowns['max_tip_def'] = max(max_tip_def_array)
 
+
 class Blade_Damage(Group):
     def __init__(self, FASTinfo, naero=17, nstr=38):
         super(Blade_Damage, self).__init__()
 
+        # params to calculate DEMs
         self.add('chord_sub', IndepVarComp('chord_sub', np.zeros(4),units='m'), promotes=['*'])
         self.add('theta_sub', IndepVarComp('theta_sub', np.zeros(4), units='deg'), promotes=['*'])
         self.add('r_max_chord', IndepVarComp('r_max_chord', 0.0), promotes=['*'])
@@ -2745,12 +2803,26 @@ class Blade_Damage(Group):
         self.add('teT', IndepVarComp('teT', val=np.zeros(5), units='m', desc='trailing-edge thickness parameters'),
                  promotes=['*'])
 
+        # params to calculate training points for surrogate model
+        self.add('turbine_class', IndepVarComp('turbine_class', val=Enum('I', 'II', 'III'), desc='IEC turbine class', pass_by_obj=True), promotes=['*'])
+        self.add('turbulence_class', IndepVarComp('turbulence_class', val=Enum('B', 'A', 'C'), desc='IEC turbulence class', pass_by_obj=True), promotes=['*'])
+        self.add('turbulence_intensity', IndepVarComp('turbulence_intensity', val=0.14, desc='IEC turbulence class intensity', pass_by_obj=False), promotes=['*'])
+        self.add('af_idx', IndepVarComp('af_idx', val=np.zeros(naero), pass_by_obj=True), promotes=['*'])
+        self.add('airfoil_types', IndepVarComp('airfoil_types', val=np.zeros(8), pass_by_obj=True), promotes=['*'])
+        self.add('nBlades', IndepVarComp('nBlades', 3, pass_by_obj=True), promotes=['*'])
+        self.add('bladeLength', IndepVarComp('bladeLength', 0.0, units='m'), promotes=['*'])
+        self.add('initial_aero_grid', IndepVarComp('initial_aero_grid', np.zeros(naero)), promotes=['*'])
+        self.add('initial_str_grid', IndepVarComp('initial_str_grid', np.zeros(nstr)), promotes=['*'])
+        self.add('rstar_damage', IndepVarComp('rstar_damage', val=np.zeros(naero+1), desc='nondimensional radial locations of damage equivalent moments'), promotes=['*'])
+
+
         # === use surrogate model of FAST outputs === #
         if FASTinfo['Use_FAST_sm']:
 
             # create fit - can check to see if files already created either here or in component
             pkl_file_name = FASTinfo['opt_dir'] + '/' + 'sm_x' + '_' + FASTinfo['approximation_model'] + '.pkl'
             if not os.path.isfile(pkl_file_name):
+
                 self.add('FAST_sm_fit', calc_FAST_sm_fit(FASTinfo, naero, nstr))
 
             # use fit
@@ -2789,11 +2861,73 @@ class Blade_Damage(Group):
                 self.add('calc_FAST_sm_training_points', Calculate_FAST_sm_training_points(FASTinfo, naero, nstr))
 
         # === necessary connections ==== #
+
         if FASTinfo['use_FAST']:
 
             # FAST config
             self.connect('chord_sub', 'FASTconfig.chord_sub')
             self.connect('theta_sub', 'FASTconfig.theta_sub')
 
+            # FAST Constraints
+            self.connect('initial_aero_grid', 'FASTConstraints.initial_aero_grid')
+            self.connect('initial_str_grid', 'FASTConstraints.initial_str_grid')
+            self.connect('rstar_damage', 'FASTConstraints.rstar_damage')
+
+        # train FAST surrogate model points
+        if FASTinfo['train_sm']:
+            # FAST outputs
+            self.connect('Flp_max', 'calc_FAST_sm_training_points.Flp_max')
+            self.connect('Edg_max', 'calc_FAST_sm_training_points.Edg_max')
+            self.connect('DEMx', 'calc_FAST_sm_training_points.DEMx')
+            self.connect('DEMy', 'calc_FAST_sm_training_points.DEMy')
+            self.connect('max_tip_def', 'calc_FAST_sm_training_points.max_tip_def')
+
+            # design variables
+            self.connect('r_max_chord', 'calc_FAST_sm_training_points.r_max_chord')
+            self.connect('chord_sub', 'calc_FAST_sm_training_points.chord_sub')
+            self.connect('theta_sub', 'calc_FAST_sm_training_points.theta_sub')
+            self.connect('sparT', 'calc_FAST_sm_training_points.sparT')
+            self.connect('teT', 'calc_FAST_sm_training_points.teT')
+
+            # calculate chord / blade length
+            self.connect('bladeLength', 'calc_FAST_sm_training_points.bladeLength')
+            self.connect('nBlades', 'calc_FAST_sm_training_points.nBlades')
+
+            # other surrogate model inputs
+            self.connect('turbine_class', 'calc_FAST_sm_training_points.turbine_class')
+            self.connect('turbulence_class', 'calc_FAST_sm_training_points.turbulence_class')
+            self.connect('af_idx', 'calc_FAST_sm_training_points.af_idx')
+            self.connect('airfoil_types', 'calc_FAST_sm_training_points.airfoil_types')
+
+        # FAST surrogate model
+        if FASTinfo['Use_FAST_sm']:
+
+            # design variables
+            self.connect('r_max_chord', 'use_FAST_sm_fit.r_max_chord')
+            self.connect('chord_sub', 'use_FAST_sm_fit.chord_sub')
+            self.connect('theta_sub', 'use_FAST_sm_fit.theta_sub')
+            self.connect('sparT', 'use_FAST_sm_fit.sparT')
+            self.connect('teT', 'use_FAST_sm_fit.teT')
+
+            # calculate chord / blade length
+            self.connect('bladeLength', 'use_FAST_sm_fit.bladeLength')
+            self.connect('nBlades', 'use_FAST_sm_fit.nBlades')
+
+            # other surrogate model inputs
+            self.connect('turbine_class', 'use_FAST_sm_fit.turbine_class')
+            self.connect('turbulence_class', 'use_FAST_sm_fit.turbulence_class')
+            self.connect('af_idx', 'use_FAST_sm_fit.af_idx')
+            self.connect('airfoil_types', 'use_FAST_sm_fit.airfoil_types')
+
+            self.connect('bladeLength', 'FAST_sm_fit.bladeLength')
+            self.connect('nBlades', 'FAST_sm_fit.nBlades')
+
+            self.connect('r_max_chord', 'FAST_sm_fit.r_max_chord')
+            self.connect('chord_sub', 'FAST_sm_fit.chord_sub')
+            self.connect('theta_sub', 'FAST_sm_fit.theta_sub')
+            self.connect('sparT', 'FAST_sm_fit.sparT')
+            self.connect('teT', 'FAST_sm_fit.teT')
+
 if __name__=="__main__":
+
 	pass

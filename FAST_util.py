@@ -99,7 +99,7 @@ def setupFAST(FASTinfo, description):
 
     # FASTinfo['template_dir'] = FASTinfo['path'] + 'RotorSE_FAST/RotorSE/src/rotorse/' \
     #                         'FAST_Files/FAST_File_templates/' + FASTinfo['FAST_template_name'] + '/'
-    FASTinfo['template_dir'] = FASTinfo['path'] + 'FAST_Files/FAST_File_templates/' + FASTinfo['FAST_template_name'] + '/'
+    FASTinfo['template_dir'] = FASTinfo['path'] + 'blade-damage/FAST_Files/FAST_File_templates/' + FASTinfo['FAST_template_name'] + '/'
 
     # === get FAST executable === #
     FASTinfo = get_FAST_executable(FASTinfo)
@@ -115,7 +115,7 @@ def setupFAST(FASTinfo, description):
         # for running multiple times
         # FASTinfo['prev_opt_dir'] = ''.join((FASTinfo['path'], 'RotorSE_FAST/' \
         #     'RotorSE/src/rotorse/FAST_Files/Opt_Files/', FASTinfo['prev_description']))
-        FASTinfo['prev_opt_dir'] = ''.join((FASTinfo['path'], './FAST_Files/Opt_Files/', FASTinfo['prev_description']))
+        FASTinfo['prev_opt_dir'] = ''.join((FASTinfo['path'], 'blade-damage/FAST_Files/Opt_Files/', FASTinfo['prev_description']))
 
     FASTinfo['max_DEMx_file'] = FASTinfo['opt_dir'] + '/xDEM_max.txt'
     FASTinfo['max_DEMy_file'] = FASTinfo['opt_dir'] + '/yDEM_max.txt'
@@ -247,6 +247,9 @@ def setupFAST_other(FASTinfo):
     # change just chord, twist distributions
     FASTinfo['set_chord_twist'] = True
 
+    # calculate DEMs, extreme moments without optimization routine, using surrogate model
+    FASTinfo['calc_DEM_using_sm_no_opt'] = True
+
     return FASTinfo
 
 # ========================================================================================================= #
@@ -349,10 +352,10 @@ def choose_wnd_dir(FASTinfo):
         FASTinfo['turbulence_intensity'] = 0.16
 
     # === turbulent, nonturbulent directories === #
-    FASTinfo['master_turb_wnd_dir'] = './WND_Files/turb_wnd_dir_' \
+    FASTinfo['master_turb_wnd_dir'] = 'blade-damage/WND_Files/turb_wnd_dir_' \
     + FASTinfo['turbulence_class'] + '_' + FASTinfo['turbine_class'] + '/'
 
-    FASTinfo['master_nonturb_wnd_dir'] = './WND_Files/nonturb_wnd_dir/'
+    FASTinfo['master_nonturb_wnd_dir'] = 'blade-damage/WND_Files/nonturb_wnd_dir/'
 
 
     if FASTinfo['train_sm']:
@@ -362,7 +365,7 @@ def choose_wnd_dir(FASTinfo):
         except:
             training_point_num = 0
 
-        new_wnd_dir = './WND_Files/training_point_' + str(training_point_num)
+        new_wnd_dir = 'blade-damage/WND_Files/training_point_' + str(training_point_num)
 
         # create new wind directories if training points for surrogate model
         if not os.path.isdir(FASTinfo['path'] + new_wnd_dir):
@@ -543,15 +546,15 @@ def plot_kfolds(FASTinfo):
 def get_FAST_executable(FASTinfo):
 
     if FASTinfo['FAST_template_name'] == 'NREL5MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_0.75MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_075MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_WP_075MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_1.5MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_15MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_WP_15MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_3.0MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_3MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_WP_3MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_5.0MW':
-        FASTinfo['fst_exe'] = FASTinfo['path'] + './FAST_exe/' + 'FAST_WP_5MW_glin64'
+        FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_WP_5MW_glin64'
     else:
         raise Exception('FAST executable unavailable, must be built from source.')
 
@@ -936,7 +939,7 @@ def create_surr_model_lhs_options(FASTinfo, rotor):
                 spec_val = FASTinfo[spec_var_name + '_init'][index]
 
             # create new range
-            FASTinfo['range_frac'] = 0.25  # 0.15, 0.25, 0.35
+            FASTinfo['range_frac'] = 0.05  # 0.15, 0.25, 0.35
             range_frac =  FASTinfo['range_frac']
             range_len = var_range[1]-var_range[0]
             new_var_range = [spec_val-range_frac*range_len, spec_val+range_frac*range_len]

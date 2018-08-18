@@ -12,13 +12,16 @@ if __name__ == "__main__":
     FASTinfo['calc_fixed_DEMs'] = False
     FASTinfo['calc_fixed_DEMs_seq'] = False
     FASTinfo['calc_surr_model'] = False
-    FASTinfo['opt_with_surr_model'] = True
+    FASTinfo['opt_with_surr_model'] = True  # doesn't do optimization, but rather calculates DEMs and extreme moments based on already trained data
 
     # unused options for optimization, but still need to set to boolean False
     FASTinfo['opt_without_FAST'] = False
     FASTinfo['opt_with_FAST_in_loop'] = False
     FASTinfo['opt_with_fixed_DEMs'] = False
     FASTinfo['opt_with_fixed_DEMs_seq'] = False
+
+    # only used when doing blade optimization
+    FASTinfo['opt_with_fatigue'] = False
 
     description = 'trained_data'
 

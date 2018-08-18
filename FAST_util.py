@@ -52,6 +52,9 @@ def setupFAST(FASTinfo, description):
     # === set up FAST top level options === #
     FASTinfo = setup_top_level_options(FASTinfo)
 
+    # set up blade-damage location
+    FASTinfo = blade_damage_loc(FASTinfo)
+
     # === set up FAST check options === #
     FASTinfo = setupFAST_checks(FASTinfo)
 
@@ -263,6 +266,18 @@ def setup_rotor(FASTinfo):
         rotor = Problem(impl=PetscImpl)
 
     return rotor
+
+# ========================================================================================================= #
+
+def blade_damage_loc(FASTinfo):
+
+    if FASTinfo['opt_with_fatigue'] == True:
+        FASTinfo['bd_loc'] = '../../../../blade-damage/'
+    else:
+        FASTinfo['bd_loc'] = './'
+
+
+    return FASTinfo
 
 # ========================================================================================================= #
 
@@ -1560,7 +1575,7 @@ def add_outputs(FASTinfo):
     FASTinfo['output_list'] = []
 
     # OutputList = open("FAST_Files/FASTOutputList_full.txt", 'r')
-    OutputList = open("FAST_Files/FASTOutputList.txt", 'r')
+    OutputList = open( FASTinfo['bd_loc'] + 'FAST_Files/FASTOutputList.txt', 'r')
 
     lines = OutputList.read().split('\n')
 

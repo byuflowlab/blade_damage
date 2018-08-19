@@ -1,0 +1,68 @@
+/Users/bingersoll/Dropbox/GradPrograms/blade_damage/src/blade_damage/FAST_Files/Opt_Files/test_new/sgp3/WNDfile1_sgp3/fst_runfile_ADAMS
+/Users/bingersoll/Dropbox/GradPrograms/blade_damage/src/blade_damage/FAST_Files/Opt_Files/test_new/sgp3/WNDfile1_sgp3/fst_runfile_ADAMS_LIN
+MOTION/3150, VELOCITY, ICDISP = 0
+MOTION/3150, DISPLACEMENT, FUNCTION =  3.141593E+00
+GFORCE/11010, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11020, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11030, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11040, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11050, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11060, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11070, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11080, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11090, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11100, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11110, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11120, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11130, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11140, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11150, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11160, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/11170, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21010, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21020, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21030, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21040, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21050, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21060, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21070, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21080, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21090, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21100, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21110, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21120, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21130, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21140, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21150, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21160, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/21170, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31010, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31020, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31030, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31040, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31050, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31060, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31070, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31080, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31090, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31100, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31110, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31120, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31130, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31140, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31150, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31160, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+GFORCE/31170, FX = 0\ FY = 0\ FZ = 0\ TX = 0\ TY = 0\ TZ = 0\
+REQUEST/1, FUNCTION = USER( 0, 0 )
+INTEGRATOR/GSTIFF, ERROR = 0.001, HMAX =  1.250000E-02, INTERPOLATE = ON
+SIMULATE/DYNAMICS, END =  1.250000E-02, DTOUT =  1.250000E-02
+DEACTIVATE/MOTION, ID = 2010
+DEACTIVATE/MOTION, ID = 3020
+DEACTIVATE/JOINT, RANGE = 1301, 1320
+DEACTIVATE/JOINT, ID = 1500
+DEACTIVATE/JOINT, RANGE = 13001, 13017
+DEACTIVATE/JOINT, RANGE = 23001, 23017
+DEACTIVATE/JOINT, RANGE = 33001, 33017
+SIMULATE/STATICS
+LINEAR/EIGENSOL, COORDS = 1, 25
+STOP

@@ -1,0 +1,45 @@
+Aerodyn input file for FAST
+SI
+BEDDOES
+NO_CM
+DYNIN
+SWIRL
+0.005
+PRANDtl
+NONE
+"/Users/bingersoll/Dropbox/GradPrograms/blade-damage/WND_Files/training_point_0/nonturb_wnd_dir/nom.wnd"
+90.0
+0.0
+9999.9
+9999.9
+1.225
+0.000014640
+0.02479
+ 8
+"AeroData/Airfoil0.dat"
+"AeroData/Airfoil1.dat"
+"AeroData/Airfoil2.dat"
+"AeroData/Airfoil3.dat"
+"AeroData/Airfoil4.dat"
+"AeroData/Airfoil5.dat"
+"AeroData/Airfoil6.dat"
+"AeroData/Airfoil7.dat"
+17
+Nodal properties
+2.86670	13.438	2.7333	3.672	    1	NOPRINT
+5.60000	12.453	2.7333	3.970	    1	NOPRINT
+8.33330	11.502	2.7333	4.230	    2	NOPRINT
+11.75000	10.372	4.1000	4.478	    3	NOPRINT
+15.85000	9.118	4.1000	4.621	    4	NOPRINT
+19.95000	7.997	4.1000	4.545	    4	NOPRINT
+24.05000	7.016	4.1000	4.302	    5	NOPRINT
+28.15000	6.126	4.1000	4.044	    6	NOPRINT
+32.25000	5.270	4.1000	3.775	    6	NOPRINT
+36.35000	4.395	4.1000	3.494	    7	NOPRINT
+40.45000	3.443	4.1000	3.201	    7	NOPRINT
+44.55000	2.417	4.1000	2.901	    8	NOPRINT
+48.65000	1.379	4.1000	2.604	    8	NOPRINT
+52.75000	0.322	4.1000	2.305	    8	NOPRINT
+56.16670	-0.580	2.7333	2.052	    8	NOPRINT
+58.90000	-1.318	2.7333	1.847	    8	NOPRINT
+61.63330	-2.075	2.7333	1.636	    8	NOPRINT

@@ -1118,10 +1118,18 @@ class calc_FAST_sm_fit(Component):
 
             quit()
 
+        if self.approximation_model == 'second_order_poly' or self.approximation_model == 'least_squares':
+            pass
+        else:
+            raise Exception('only polynomial fits can be pickled. Either change the approximation '
+                            'model to second_order_poly or least_squares, or do not pickle fit.')
+
 
         # === created surrogate models to .pkl files
         sm_list = [sm_x, sm_y, sm_x_load, sm_y_load]
         sm_string_list = ['sm_x', 'sm_y', 'sm_x_load', 'sm_y_load']
+
+
 
         for i in range(len(sm_list)):
             pkl_file_name = self.opt_dir + '/' + sm_string_list[i] + '_' + self.approximation_model + '.pkl'

@@ -97,7 +97,7 @@ def setupFAST(FASTinfo, description):
 
     # === set FAST template files === #
 
-    # NREL5MW, WP_5.0MW, WP_3.0MW, WP_1.5MW, WP_0.75MW
+    # NREL5MW, WP_5.0MW, WP_3.0MW, WP_1.5MW, WP_0.75MW, testWT
     FASTinfo['FAST_template_name'] = 'NREL5MW'
 
     # FASTinfo['template_dir'] = FASTinfo['path'] + 'RotorSE_FAST/RotorSE/src/rotorse/' \
@@ -570,6 +570,9 @@ def get_FAST_executable(FASTinfo):
         FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_WP_3MW_glin64'
     elif FASTinfo['FAST_template_name'] == 'WP_5.0MW':
         FASTinfo['fst_exe'] = FASTinfo['path'] + 'blade-damage/FAST_exe/' + 'FAST_WP_5MW_glin64'
+    elif FASTinfo['FAST_template_name'] == 'testWT':
+        print('FAST executable is unavailable, but not necessary if not using FAST.')
+        FASTinfo['fst_exe'] = ''
     else:
         raise Exception('FAST executable unavailable, must be built from source.')
 
@@ -1195,6 +1198,10 @@ def initialize_dv(FASTinfo):
         FASTinfo['chord_sub_init'] = np.array([3.564, 4.411, 2.898, 1.793])
         FASTinfo['theta_sub_init'] = np.array([11.10, 6.35, 0.95, 0.08])
 
+    elif FASTinfo['FAST_template_name'] == 'testWT':
+        FASTinfo['chord_sub_init'] = np.array([3.564, 4.411, 2.898, 1.793])
+        FASTinfo['theta_sub_init'] = np.array([11.10, 6.35, 0.95, 0.08])
+
     else:
         raise Exception('Still need to add other wind turbine initial designs')
 
@@ -1214,6 +1221,9 @@ def get_bladelength(FASTinfo):
         FASTinfo['bladeLength'] = 49.5-2.475
     elif FASTinfo['FAST_template_name'] == 'WP_5.0MW':
         FASTinfo['bladeLength'] = 64.0-3.2
+    elif FASTinfo['FAST_template_name'] == 'testWT':
+        FASTinfo['bladeLength'] = 60.8
+
     else:
         raise Exception('Unknown FAST template.')
 
@@ -1242,6 +1252,10 @@ def initialize_rotor_dv(FASTinfo, rotor):
         rotor['theta_sub'] = np.array([11.10, 6.35, 0.95, 0.08])
 
     elif FASTinfo['FAST_template_name'] == 'WP_5.0MW':
+        rotor['chord_sub'] = np.array([3.564, 4.411, 2.898, 1.793])
+        rotor['theta_sub'] = np.array([11.10, 6.35, 0.95, 0.08])
+
+    elif FASTinfo['FAST_template_name'] == 'testWT':
         rotor['chord_sub'] = np.array([3.564, 4.411, 2.898, 1.793])
         rotor['theta_sub'] = np.array([11.10, 6.35, 0.95, 0.08])
 

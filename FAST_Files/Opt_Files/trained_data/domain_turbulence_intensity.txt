@@ -1,3 +1,0 @@
-turbulence_intensity
--4.86
-5.14
